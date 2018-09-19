@@ -1,6 +1,7 @@
 #  EOS Smart Contract Development Security Best Practices
 
 中文版请见: [此处](/README.md)
+
 English version translated by: [Kai Jing(from EOS42)](https://t.me/shuke0327)
 
 This document aims to provide some **security guidelines** for developers of EOS smart contracts and list analysis of some **known contract vulnerabilities**. We invite the community to suggest for modifications or improvements of this document and welcome various kinds of pull requests.  You are also welcomed to add relevant articles or blogs published, please add them to [reference](#Reference).
@@ -198,7 +199,7 @@ Bind each key action and code to meet the requirements, in order to avoid abnorm
 
 #### [The Real Case](#the-real-case-2)
 
-[EOSBet is hacked](https://medium.com/@eosbetcasino/eosbet-%E9%BB%91%E5%AE%A2%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6%E5%A4%8D%E7%9B%98-13663d8f3f1)
+[EOSBet Transfer Hack Statement](https://medium.com/@eosbetcasino/eosbet-transfer-hack-statement-31a3be4f5dcf)
 
 ## [Reference](#reference)
 
@@ -213,7 +214,7 @@ Bind each key action and code to meet the requirements, in order to avoid abnorm
 - [CryptoKylin Workgroup](https://github.com/cryptokylin)
 - eosiofans
 - Kai Jing(荆凯)
-- Hun Xing(星魂)
-- Niang Dao(岛娘)
+- 星魂
+- 岛娘
 - Yu Zhao(赵余)
 - 字符
