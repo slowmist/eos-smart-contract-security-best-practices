@@ -1,30 +1,31 @@
 #  EOS Smart Contract Development Security Best Practices
 
 中文版请见: [此处](/README.md)
+English version translated by: [Kai Jing(from EOS42)](https://t.me/shuke0327)
 
 This document aims to provide some **security guidelines** for developers of EOS smart contracts and list analysis of some **known contract vulnerabilities**. We invite the community to suggest for modifications or improvements of this document and welcome various kinds of pull requests.  You are also welcomed to add relevant articles or blogs published, please add them to [reference](#Reference).
 
 
 ## Directories
 
-* [Security Guidelines](#Security-Guidelines)
-* [Known Vulnerabilities](#Known-Vulnerabilities)
-   * [Numerical Overflow](#Numerical-Overflow)
-      * [Vulnerability Sample](#Vulnerability-Sample)
-      * [Defense Method](#Defense-Method)
-      * [The Real Case](#The-Real-Case)
-   * [Authorization Check](#Authorization-Check)
-      * [Vulnerability Sample](#Vulnerability-Sample-1)
-      * [Defense Method](#Defense-Method-1)
-      * [The Real Case](#The-Real-Case-1)
-   * [Apply Check](#Apply-Check)
-      * [Vulnerability Sample](#Vulnerability-Sample-2)
-      * [Defense Method](#Defense-Method-2)
-      * [The Real Case](#The-Real-Case-2)
-* [Reference](#Reference)
-* [Acknowledgement](#Acknowledgement)
+* [Security Guidelines](#security-guidelines)
+* [Known Vulnerabilities](#known-vulnerabilities)
+   * [Numerical Overflow](#numerical-overflow)
+      * [Vulnerability Sample](#vulnerability-sample)
+      * [Defense Method](#defense-method)
+      * [The Real Case](#the-real-case)
+   * [Authorization Check](#authorization-check)
+      * [Vulnerability Sample](#vulnerability-sample-1)
+      * [Defense Method](#defense-method-1)
+      * [The Real Case](#the-real-case-1)
+   * [Apply Check](#apply-check)
+      * [Vulnerability Sample](#vulnerability-sample-2)
+      * [Defense Method](#defense-method-2)
+      * [The Real Case](#the-real-case-2)
+* [Reference](#reference)
+* [Acknowledgement](#acknowledgement)
 
-## [Security Guidelines](#Security-Guidelines)
+## [Security Guidelines](#security-guidelines)
 
 EOS is still in its early stages and has some experimental characteristics. As a result, as new bugs and security vulnerabilities are discovered and new features are developed, the security threats we face are constantly changing. This article is just the start for developers  to create secure smart contracts.
 
@@ -57,13 +58,13 @@ Always follow these rules:
 - **Get clear understanding of blockchain features**。Although your previous programming experience is also applicable to smart contract development, there are still pitfalls to keep an eye out for：
   - `require_recipient(account_name name)` will trigger notification，and call the function with the same name within `name` contract，[see official doc here](https://developers.eos.io/eosio-cpp/v1.2.0/reference#section-require_recipient)
 
-## [Known Vulnerabilities](#Known-Vulnerabilities)
+## [Known Vulnerabilities](#known-vulnerabilities)
 
-### [Numerical Overflow](#Numerical-Overflow)
+### [Numerical Overflow](#numerical-overflow)
 
 When doing arithmetic operations, failing to check the boundaries may cause the values to overflow, causing loss of  users assets.
 
-#### [Vulnerability Sample](#Vulnerability-Sample)
+#### [Vulnerability Sample](#vulnerability-sample)
 
 codes with vulnerability：`batchTransfer` batch transfer
 
@@ -105,18 +106,18 @@ void transfer(symbol_name symbol, account_name from, account_names to, uint64_t 
 }
 ```
 
-#### [Defense Method](#Defense-Method)
+#### [Defense Method](#defense-method)
 As far as possible, use the `asset` structure for operations, rather than extract `balance` for operations.
 
-#### [The Real Case](#The-Real-Case)
+#### [The Real Case](#the-real-case)
 
 - [【Don't play EOS Fomo3D Game】the Wolf game is under overflow attack and go die](https://bihu.com/article/995093)
 
-### [Authorization Check](#Authorization-Check)
+### [Authorization Check](#authorization-check)
 
 When making relevant operations, please do strictly determine whether the parameters passed into the function are consistent with the actual caller , use `require_auth` for authorization check.
 
-#### [Vulnerability Sample](#Vulnerability-Sample-1)
+#### [Vulnerability Sample](#vulnerability-sample-1)
 
 codes with vulnerability：`transfer` 
 
@@ -147,19 +148,19 @@ void token::transfer( account_name from,
 }
 ```
 
-#### [Defense Method](#Defense-Method-1)
+#### [Defense Method](#defense-method-1)
 
 Use `require_auth( from )` method to check whether the asset transfer account is consistent with the calling account
 
-#### [The Real Case](#The-Real-Case-1)
+#### [The Real Case](#the-real-case-1)
 
 None
 
-### [Apply Check](#Apply-Check)
+### [Apply Check](#apply-check)
 
 When processing contract calls, ensure that each action and codes meet the associated requirements.
 
-#### [Vulnerability Sample](#Vulnerability-Sample-2)
+#### [Vulnerability Sample](#vulnerability-sample-2)
 
 codes with vulnerability：
 
@@ -186,7 +187,7 @@ extern "C" { \
 EOSIO_ABI_EX(eosio::charity, (hi)(transfer))
 ```
 
-#### [Defense Method](#Defense-Method-2)
+#### [Defense Method](#defense-method-2)
 
 Use the codes below:
 
@@ -195,11 +196,11 @@ if( ((code == self  && action != N(transfer) ) || (code == N(eosio.token) && act
 ```
 Bind each key action and code to meet the requirements, in order to avoid abnormal and illegal calls.
 
-#### [The Real Case](#The-Real-Case-2)
+#### [The Real Case](#the-real-case-2)
 
 [EOSBet is hacked](https://medium.com/@eosbetcasino/eosbet-%E9%BB%91%E5%AE%A2%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6%E5%A4%8D%E7%9B%98-13663d8f3f1)
 
-## [Reference](#Reference)
+## [Reference](#reference)
 
 - [保管好私钥就安全了吗？注意隐藏在EOS DAPP中的安全隐患](https://zhuanlan.zhihu.com/p/40625180)
 - [漏洞详解|恶意 EOS 合约存在吞噬用户 RAM 的安全风险](https://zhuanlan.zhihu.com/p/40469719)
@@ -207,12 +208,12 @@ Bind each key action and code to meet the requirements, in order to avoid abnorm
 - [BET被黑客攻击始末，实锤还原作案现场和攻击手段](https://github.com/ganjingcun/bet-death-causes/blob/master/README.md)
 - [累计薅走数百万，EOS Dapps已成黑客提款机？](https://mp.weixin.qq.com/s/74ggygC3nbDihLkobXOW2w)
 
-## [Acknowledgement](#Acknowledgement)
+## [Acknowledgement](#acknowledgement)
 
 - [CryptoKylin Workgroup](https://github.com/cryptokylin)
 - eosiofans
-- Kai Jing(from EOS42)
+- Kai Jing(荆凯)
 - Hun Xing(星魂)
 - Niang Dao(岛娘)
-- Yu Zhao(from EOSLaoMao)
+- Yu Zhao(赵余)
 - 字符
