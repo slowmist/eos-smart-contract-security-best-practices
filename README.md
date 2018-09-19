@@ -1,5 +1,7 @@
 # EOS 智能合约最佳安全开发指南
 
+English Version: [check here](/README_EN.md)
+
 这篇文档旨在为 EOS 智能合约开发人员提供一些智能合约的**安全准则**及**已知漏洞分析**。我们邀请社区对该文档提出修改或完善建议，欢迎各种合并请求(Pull Request)。若有相关的文章或博客的发表，也请将其加入到[参考文献](#参考文献)中。
 
 ## 目录
@@ -204,8 +206,8 @@ if( ((code == self  && action != N(transfer) ) || (code == N(eosio.token) && act
 
 - [麒麟工作组](https://github.com/cryptokylin)
 - eosiofans
-- 荆凯
+- 荆凯(EOS42)
 - 星魂
 - 岛娘
-- 赵余
+- 赵余(EOSLaoMao)
 - 字符
