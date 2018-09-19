@@ -7,24 +7,24 @@ This document aims to provide some **security guidelines** for developers of EOS
 
 ## Directories
 
-* [Security Guidelines](#SecurityGuidelines)
-* [Known Vulnerabilities](#KnownVulnerabilities)
-   * [Numerical Overflow](#NumericalOverflow)
-      * [Vulnerability Sample](#VulnerabilitySample)
-      * [Defense Method](#DefenseMethod)
-      * [The Real Case](#RealCase)
-   * [Authorization Check](#AuthorizationCheck)
-      * [Vulnerability Sample](#VulnerabilitySample-1)
-      * [Defense Method](#DefenseMethod-1)
-      * [The Real Case](#TheRealCase-1)
-   * [Apply Check](#apply-check)
-      * [Vulnerability Sample](#VulnerabilitySample-2)
-      * [Defense Method](#DefenseMethod-2)
-      * [The Real Case](#TheRealCase-2)
+* [Security Guidelines](#Security-Guidelines)
+* [Known Vulnerabilities](#Known-Vulnerabilities)
+   * [Numerical Overflow](#Numerical-Overflow)
+      * [Vulnerability Sample](#Vulnerability-Sample)
+      * [Defense Method](#Defense-Method)
+      * [The Real Case](#The-Real-Case)
+   * [Authorization Check](#Authorization-Check)
+      * [Vulnerability Sample](#Vulnerability-Sample-1)
+      * [Defense Method](#Defense-Method-1)
+      * [The Real Case](#The-Real-Case-1)
+   * [Apply Check](#Apply-Check)
+      * [Vulnerability Sample](#Vulnerability-Sample-2)
+      * [Defense Method](#Defense-Method-2)
+      * [The Real Case](#The-Real-Case-2)
 * [Reference](#Reference)
 * [Acknowledgement](#Acknowledgement)
 
-## [Security Guidelines](SecurityGuidelines)
+## [Security Guidelines](#Security-Guidelines)
 
 EOS is still in its early stages and has some experimental characteristics. As a result, as new bugs and security vulnerabilities are discovered and new features are developed, the security threats we face are constantly changing. This article is just the start for developers  to create secure smart contracts.
 
@@ -57,13 +57,13 @@ Always follow these rules:
 - **Get clear understanding of blockchain features**。Although your previous programming experience is also applicable to smart contract development, there are still pitfalls to keep an eye out for：
   - `require_recipient(account_name name)` will trigger notification，and call the function with the same name within `name` contract，[see official doc here](https://developers.eos.io/eosio-cpp/v1.2.0/reference#section-require_recipient)
 
-## [Known Vulnerabilities](#KnownVulnerabilities)
+## [Known Vulnerabilities](#Known-Vulnerabilities)
 
-### [Numerical Overflow](#NumericalOverflow)
+### [Numerical Overflow](#Numerical-Overflow)
 
 When doing arithmetic operations, failing to check the boundaries may cause the values to overflow, causing loss of  users assets.
 
-#### [Vulnerability Sample](#VulnerabilitySample)
+#### [Vulnerability Sample](#Vulnerability-Sample)
 
 codes with vulnerability：`batchTransfer` batch transfer
 
@@ -105,18 +105,18 @@ void transfer(symbol_name symbol, account_name from, account_names to, uint64_t 
 }
 ```
 
-#### [Defense Method](#DefenseMethod)
+#### [Defense Method](#Defense-Method)
 As far as possible, use the `asset` structure for operations, rather than extract `balance` for operations.
 
-#### [The Real Case](#RealCase)
+#### [The Real Case](#The-Real-Case)
 
 - [【Don't play EOS Fomo3D Game】the Wolf game is under overflow attack and go die](https://bihu.com/article/995093)
 
-### [Authorization Check](#AuthorizationCheck)
+### [Authorization Check](#Authorization-Check)
 
 When making relevant operations, please do strictly determine whether the parameters passed into the function are consistent with the actual caller , use `require_auth` for authorization check.
 
-#### [Vulnerability Sample](#VulnerabilitySample-1)
+#### [Vulnerability Sample](#Vulnerability-Sample-1)
 
 codes with vulnerability：`transfer` 
 
@@ -147,19 +147,19 @@ void token::transfer( account_name from,
 }
 ```
 
-#### [Defense Method](#DefenseMethod-1)
+#### [Defense Method](#Defense-Method-1)
 
 Use `require_auth( from )` method to check whether the asset transfer account is consistent with the calling account
 
-#### [The Real Case](#TheRealCase-1)
+#### [The Real Case](#The-Real-Case-1)
 
 None
 
-### [Apply Check](#apply-check)
+### [Apply Check](#Apply-Check)
 
 When processing contract calls, ensure that each action and codes meet the associated requirements.
 
-#### [Vulnerability Sample](#VulnerabilitySample-2)
+#### [Vulnerability Sample](#Vulnerability-Sample-2)
 
 codes with vulnerability：
 
@@ -186,7 +186,7 @@ extern "C" { \
 EOSIO_ABI_EX(eosio::charity, (hi)(transfer))
 ```
 
-#### [Defense Method](#DefenseMethod-2)
+#### [Defense Method](#Defense-Method-2)
 
 Use the codes below:
 
@@ -195,7 +195,7 @@ if( ((code == self  && action != N(transfer) ) || (code == N(eosio.token) && act
 ```
 Bind each key action and code to meet the requirements, in order to avoid abnormal and illegal calls.
 
-#### [The Real Case](#TheRealCase-2)
+#### [The Real Case](#The-Real-Case-2)
 
 [EOSBet is hacked](https://medium.com/@eosbetcasino/eosbet-%E9%BB%91%E5%AE%A2%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6%E5%A4%8D%E7%9B%98-13663d8f3f1)
 
