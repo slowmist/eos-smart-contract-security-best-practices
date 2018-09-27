@@ -48,7 +48,7 @@ EOS 处于早期阶段并且有很强的实验性质。因此，随着新的 bug
 	- 尽可能快的将使用到的库或者工具更新到最新
 	- 使用最新的安全技术
 - **清楚区块链的特性**。尽管你先前所拥有的编程经验同样适用于智能合约开发，但这里仍然有些陷阱你需要留意：
-	- `require_recipient(account_name name)` 可触发通知，调用`name`合约中的同名函数，[官方文档](https://developers.eos.io/eosio-cpp/v1.2.0/reference#section-require_recipient)
+	- `require_recipient(account_name name)` 可触发通知，如果账户`name`下有合约，会调用`name`合约中的同名函数，[官方文档](https://developers.eos.io/eosio-cpp/v1.2.0/reference#section-require_recipient)
 
 ## 已知漏洞
 
@@ -58,7 +58,7 @@ EOS 处于早期阶段并且有很强的实验性质。因此，随着新的 bug
 
 #### 漏洞示例
 
-存在缺陷的代码：`batchTransfer` 批量转账
+存在缺陷的代码：`batchtransfer` 批量转账
 
 ```c++
 typedef struct acnts {
@@ -68,7 +68,7 @@ typedef struct acnts {
     account_name name3;
 } account_names;
 
-void transfer(symbol_name symbol, account_name from, account_names to, uint64_t balance)
+void batchtransfer(symbol_name symbol, account_name from, account_names to, uint64_t balance)
 {
     require_auth(from);
     account fromaccount;

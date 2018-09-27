@@ -57,7 +57,7 @@ Always follow these rules:
   - Use the latest security technologies
 
 - **Get clear understanding of blockchain features**。Although your previous programming experience is also applicable to smart contract development, there are still pitfalls to keep an eye out for：
-  - `require_recipient(account_name name)` will trigger notification，and call the function with the same name within `name` contract，[see official doc here](https://developers.eos.io/eosio-cpp/v1.2.0/reference#section-require_recipient)
+  - `require_recipient(account_name name)` will trigger notification，and call the function with the same name within `name` contract(if account `name` already deployed contract)，[see official doc here](https://developers.eos.io/eosio-cpp/v1.2.0/reference#section-require_recipient)
 
 ## [Known Vulnerabilities](#known-vulnerabilities)
 
@@ -67,7 +67,7 @@ When doing arithmetic operations, failing to check the boundaries may cause the 
 
 #### [Vulnerability Sample](#vulnerability-sample)
 
-codes with vulnerability：`batchTransfer` batch transfer
+codes with vulnerability：`batchtransfer` batch transfer
 
 ```c++
 typedef struct acnts {
@@ -77,7 +77,7 @@ typedef struct acnts {
     account_name name3;
 } account_names;
 
-void transfer(symbol_name symbol, account_name from, account_names to, uint64_t balance)
+void batchtransfer(symbol_name symbol, account_name from, account_names to, uint64_t balance)
 {
     require_auth(from);
     account fromaccount;
