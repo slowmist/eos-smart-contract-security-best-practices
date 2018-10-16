@@ -20,6 +20,10 @@ English Version: [check here](/README_EN.md)
       * [漏洞示例](#漏洞示例-2)
       * [防御方法](#防御方法-2)
       * [真实案例](#真实案例-2)
+   * [transfer 假通知](#transfer-假通知)
+      * [漏洞示例](#漏洞示例-3)
+      * [防御方法](#防御方法-3)
+      * [真实案例](#真实案例-3)
 * [参考文献](#参考文献)
 * [致谢](#致谢)
 
@@ -193,6 +197,40 @@ if( ((code == self  && action != N(transfer) ) || (code == N(eosio.token) && act
 #### 真实案例
 
 - [EOSBet 黑客攻击事件复盘](https://medium.com/@eosbetcasino/eosbet-%E9%BB%91%E5%AE%A2%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6%E5%A4%8D%E7%9B%98-13663d8f3f1)
+
+### transfer 假通知
+
+在处理 `require_recipient` 触发的通知时，应确保 `transfer.to` 为 `_self`。
+
+#### 漏洞示例
+
+存在缺陷的代码：
+
+```c++
+// source code: https://gitlab.com/EOSBetCasino/eosbetdice_public/blob/master/EOSBetDice.cpp#L115
+void transfer(uint64_t sender, uint64_t receiver) {
+
+	auto transfer_data = unpack_action_data<st_transfer>();
+
+	if (transfer_data.from == _self || transfer_data.from == N(eosbetcasino)){
+		return;
+	}
+
+	eosio_assert( transfer_data.quantity.is_valid(), "Invalid asset");
+}
+```
+
+#### 防御方法
+
+增加
+
+```
+if (transfer_data.to != _self) return;
+```
+
+#### 真实案例
+
+- [EOS DApp 充值“假通知”漏洞分析](https://mp.weixin.qq.com/s/8hg-Ykj0RmqQ69gWbVwsyg)
 
 ## 参考文献
 
