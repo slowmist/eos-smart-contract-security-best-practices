@@ -24,6 +24,10 @@ English Version: [check here](/README_EN.md)
       * [漏洞示例](#漏洞示例-3)
       * [防御方法](#防御方法-3)
       * [真实案例](#真实案例-3)
+   * [随机数实践](#随机数实践)
+      * [漏洞示例](#漏洞示例-4)
+      * [防御方法](#防御方法-4)
+      * [真实案例](#真实案例-4)
 * [参考文献](#参考文献)
 * [致谢](#致谢)
 
@@ -231,6 +235,50 @@ if (transfer_data.to != _self) return;
 #### 真实案例
 
 - [EOS DApp 充值“假通知”漏洞分析](https://mp.weixin.qq.com/s/8hg-Ykj0RmqQ69gWbVwsyg)
+
+### 随机数实践
+
+随机数生成算法不要引入可控或者可预测的种子
+
+#### 漏洞示例
+
+存在缺陷的代码：
+
+```c++
+// source code: https://github.com/loveblockchain/eosdice/blob/3c6f9bac570cac236302e94b62432b73f6e74c3b/eosbocai2222.hpp#L174
+uint8_t random(account_name name, uint64_t game_id)
+{
+    auto eos_token = eosio::token(N(eosio.token));
+    asset pool_eos = eos_token.get_balance(_self, symbol_type(S(4, EOS)).name());
+    asset ram_eos = eos_token.get_balance(N(eosio.ram), symbol_type(S(4, EOS)).name());
+    asset betdiceadmin_eos = eos_token.get_balance(N(betdiceadmin), symbol_type(S(4, EOS)).name());
+    asset newdexpocket_eos = eos_token.get_balance(N(newdexpocket), symbol_type(S(4, EOS)).name());
+    asset chintailease_eos = eos_token.get_balance(N(chintailease), symbol_type(S(4, EOS)).name());
+    asset eosbiggame44_eos = eos_token.get_balance(N(eosbiggame44), symbol_type(S(4, EOS)).name());
+    asset total_eos = asset(0, EOS_SYMBOL);
+    //攻击者可通过inline_action改变余额total_eos，从而控制结果
+    total_eos = pool_eos + ram_eos + betdiceadmin_eos + newdexpocket_eos + chintailease_eos + eosbiggame44_eos;
+    auto mixd = tapos_block_prefix() * tapos_block_num() + name + game_id - current_time() + total_eos.amount;
+    const char *mixedChar = reinterpret_cast<const char *>(&mixd);
+
+    checksum256 result;
+    sha256((char *)mixedChar, sizeof(mixedChar), &result);
+
+    uint64_t random_num = *(uint64_t *)(&result.hash[0]) + *(uint64_t *)(&result.hash[8]) + *(uint64_t *)(&result.hash[16]) + *(uint64_t *)(&result.hash[24]);
+    return (uint8_t)(random_num % 100 + 1);
+}
+```
+
+#### 防御方法
+
+EOS链上不能生成真随机数，在设计随机类应用时建议参考官方的示例
+
+- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/docs/random-number-generation)
+
+
+#### 真实案例
+
+- [慢雾预警：知名DApp EOSDice由于随机数问题再次被黑](http://www.chaindd.com/nictation/3140025.html)
 
 ## 参考文献
 
