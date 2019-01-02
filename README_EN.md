@@ -23,6 +23,20 @@ This document aims to provide some **security guidelines** for developers of EOS
       * [Vulnerability Sample](#vulnerability-sample-2)
       * [Defense Method](#defense-method-2)
       * [The Real Case](#the-real-case-2)
+   * [Transfer Error Prompt](#transfer-error-prompt)
+      * [Vulnerability Sample](#vulnerability-sample-3)
+      * [Defense Method](#defense-method-3)
+      * [The Real Case](#the-real-case-3)
+   * [Random Number Practice](#random-number-practice)
+      * [Vulnerability Sample](#vulnerability-sample-4)
+      * [Defense Method](#defense-method-4)
+      * [The Real Case](#the-real-case-4)
+   * [Rollback Attack](#rollback-attack)
+      * [Vulnerability Sample](#vulnerability-sample-5)
+      * [Defense Method](#defense-method-5)
+      * [The Real Case](#the-real-case-5)
+      
+
 * [Reference](#reference)
 * [Acknowledgement](#acknowledgement)
 
@@ -200,6 +214,107 @@ Bind each key action and code to meet the requirements, in order to avoid abnorm
 #### [The Real Case](#the-real-case-2)
 
 [EOSBet Transfer Hack Statement](https://medium.com/@eosbetcasino/eosbet-transfer-hack-statement-31a3be4f5dcf)
+
+### [Transfer Error Prompt](#transfer-error-prompt)
+
+When processing a notification triggered by `require_recipient`, ensure that `transfer.to` is `_self`.
+
+#### [Vulnerability Sample](#vulnerability-sample-3)
+
+codes with vulnerability：
+
+```c++
+// source code: https://gitlab.com/EOSBetCasino/eosbetdice_public/blob/master/EOSBetDice.cpp#L115
+void transfer(uint64_t sender, uint64_t receiver) {
+
+  auto transfer_data = unpack_action_data<st_transfer>();
+
+  if (transfer_data.from == _self || transfer_data.from == N(eosbetcasino)){
+    return;
+  }
+
+  eosio_assert( transfer_data.quantity.is_valid(), "Invalid asset");
+}
+```
+
+#### [Defense Method](#defense-method-3)
+
+add
+
+```
+if (transfer_data.to != _self) return;
+```
+
+#### [The Real Case](#the-real-case-3)
+
+- [EOS DApp recharge "error prompt" vulnerability analysis](https://mp.weixin.qq.com/s/8hg-Ykj0RmqQ69gWbVwsyg)
+
+### [Random Number Practice](#random-number-practice)
+
+Random number generator algorithm should not introduce controllable or predictable seeds
+
+#### [Vulnerability Sample](#vulnerability-sample-4)
+
+codes with vulnerability：
+
+```c++
+// source code: https://github.com/loveblockchain/eosdice/blob/3c6f9bac570cac236302e94b62432b73f6e74c3b/eosbocai2222.hpp#L174
+uint8_t random(account_name name, uint64_t game_id)
+{
+    auto eos_token = eosio::token(N(eosio.token));
+    asset pool_eos = eos_token.get_balance(_self, symbol_type(S(4, EOS)).name());
+    asset ram_eos = eos_token.get_balance(N(eosio.ram), symbol_type(S(4, EOS)).name());
+    asset betdiceadmin_eos = eos_token.get_balance(N(betdiceadmin), symbol_type(S(4, EOS)).name());
+    asset newdexpocket_eos = eos_token.get_balance(N(newdexpocket), symbol_type(S(4, EOS)).name());
+    asset chintailease_eos = eos_token.get_balance(N(chintailease), symbol_type(S(4, EOS)).name());
+    asset eosbiggame44_eos = eos_token.get_balance(N(eosbiggame44), symbol_type(S(4, EOS)).name());
+    asset total_eos = asset(0, EOS_SYMBOL);
+    //攻击者可通过inline_action改变余额total_eos，从而控制结果
+    total_eos = pool_eos + ram_eos + betdiceadmin_eos + newdexpocket_eos + chintailease_eos + eosbiggame44_eos;
+    auto mixd = tapos_block_prefix() * tapos_block_num() + name + game_id - current_time() + total_eos.amount;
+    const char *mixedChar = reinterpret_cast<const char *>(&mixd);
+
+    checksum256 result;
+    sha256((char *)mixedChar, sizeof(mixedChar), &result);
+
+    uint64_t random_num = *(uint64_t *)(&result.hash[0]) + *(uint64_t *)(&result.hash[8]) + *(uint64_t *)(&result.hash[16]) + *(uint64_t *)(&result.hash[24]);
+    return (uint8_t)(random_num % 100 + 1);
+}
+```
+
+#### [Defense Method](#defense-method-4)
+
+True random numbers cannot be generated on the EOS. It is recommended to refer to the official example when designing a random class application.
+
+- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/docs/random-number-generation)
+
+
+#### [The Real Case](#the-real-case-4)
+
+- [SlowMist warning: Well-known DApp EOSDice is hacked again due to random number problems](http://www.chaindd.com/nictation/3140025.html)
+
+
+### [Rollback Attack](#rollback-attack)
+
+- Technique 1: Detect execution results in the transaction (such as collection amount, account balance, table record, random number calculation result, etc.), and call `eosio_assert` when the result meets certain conditions, so that the current transaction fails to rollback.
+- Technique 2: Initiate a transaction using the super-node blacklist account to trick the normal node to respond, but the transaction will not be packaged.
+
+#### [Vulnerability Sample](#vulnerability-sample-5)
+
+common modes with vulnerability:
+
+- After the gambling game is bet, the draw will be opened and transferred. A malicious contract can detect if the balance is increased by `inline_action`, thus rolling back the failed lottery
+- After the gambling game is bet, the result of the draw will be written into the form. A malicious contract can detect if the balance is increased by `inline_action`, thus rolling back the failed lottery
+- The gambling game lottery results and in-game lottery number associated. A malicious contract can initiate a number of small bet transactions and a large bet transaction at the same time, and roll back the transaction when a small amount of winning is received, thereby achieving the purpose of "transferring" the prizeable lottery number to a large bet.
+- The gambling game lottery is not associated with the betting transaction, an attacker can roll back a bet transaction with a blacklist account or a malicious contract
+
+#### [Defense Method](#defense-method-5)
+
+- Use `defer action` to transfer and send receipts
+- Establish a  dependency of reveal function, such as order dependency. And check if the record is existed on the blockchain when reveal. Even if the reveal function was excuted successful on the node server, since the record is rolled back in bp, the corresponding  record will be rolled back.
+
+#### [The Real Case](#the-real-case-5)
+- [Roll Back Attack about Blacklist in EOS](https://mp.weixin.qq.com/s/WyZ4j3O68qfN5IOvjx3MOg)
 
 ## [Reference](#reference)
 
