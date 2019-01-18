@@ -1,6 +1,6 @@
 #  EOS 스마트 컨트랙트 최고의 보안 개발 가이드
 
-中文版请见: [此处](/README.md)
+中文版请见: [此处](/README.md)\
 English Version: [check here](/README_EN.md)
 
 한국어 버전 번역: [Yongsun Choi (from EXTALES)](https://github.com/ever4cys)

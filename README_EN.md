@@ -1,6 +1,6 @@
 #  EOS Smart Contract Development Security Best Practices
 
-中文版请见: [此处](/README.md)
+中文版请见: [此处](/README.md)\
 한국어 버전: [여기를 클릭](/README_KR.md)
 
 English version translated by: [Kai Jing(from EOS42)](https://t.me/shuke0327)
