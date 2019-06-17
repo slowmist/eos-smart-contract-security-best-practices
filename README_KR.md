@@ -286,7 +286,7 @@ uint8_t random(account_name name, uint64_t game_id)
 
 진정한 난수는 EOS에서 생성될 수 없다. 난수 클래스 응용프로그램을 디자인 하는 경우 공식 예제를 참조하는 것을 추천한다.
 
-- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/docs/random-number-generation)
+- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/v1.3.2/docs/random-number-generation)
 
 
 #### [실제 사례](#실제-사례-4)

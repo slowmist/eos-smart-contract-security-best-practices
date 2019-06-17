@@ -287,7 +287,7 @@ uint8_t random(account_name name, uint64_t game_id)
 
 True random numbers cannot be generated on the EOS. It is recommended to refer to the official example when designing a random class application.
 
-- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/docs/random-number-generation)
+- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/v1.3.2/docs/random-number-generation)
 
 
 #### [The Real Case](#the-real-case-4)

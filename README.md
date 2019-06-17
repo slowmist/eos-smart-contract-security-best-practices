@@ -278,7 +278,7 @@ uint8_t random(account_name name, uint64_t game_id)
 
 EOS链上不能生成真随机数，在设计随机类应用时建议参考官方的示例
 
-- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/docs/random-number-generation)
+- [Randomization in Contracts](https://developers.eos.io/eosio-cpp/v1.3.2/docs/random-number-generation)
 
 
 #### 真实案例
