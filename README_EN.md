@@ -36,6 +36,9 @@ This document aims to provide some **security guidelines** for developers of EOS
       * [Vulnerability Sample](#vulnerability-sample-5)
       * [Defense Method](#defense-method-5)
       * [The Real Case](#the-real-case-5)
+   * [Reentrancy Attack](#rollback-attack)
+      * [Vulnerability Sample](#vulnerability-sample-6)
+      * [Defense Method](#defense-method-6)
       
 
 * [Reference](#reference)
@@ -316,6 +319,56 @@ common modes with vulnerability:
 
 #### [The Real Case](#the-real-case-5)
 - [Roll Back Attack about Blacklist in EOS](https://mp.weixin.qq.com/s/WyZ4j3O68qfN5IOvjx3MOg)
+
+### Reentrancy Attack
+
+Reentrancy refers to the multiple calls to the same function within a single transaction.
+
+In the example vulnerability, if `wram::buyram` is called multiple times simultaneously, since the `action` call to `eosio::buyram` is asynchronous, the value of `auto bytes = itr->ram_bytes` obtained by `wram::buyram` will be the same. This will cause the `prev_bytes` passed to the second call of `mint` to not account for the RAM purchased in the first call, resulting in `auto amount = now_bytes - prev_bytes;` being larger than it should be. The attacker thus gains additional wRAM.
+
+#### Vulnerability Example
+```
+void wram::buyram(name from, name to, asset quantity) {
+    //...snap code...
+    rams ramstable("eosio"_n, _self.value);
+    auto itr = ramstable.find(_self.value);
+    auto bytes = itr->ram_bytes; //@audit
+    action{
+        permission_level{_self, "active"_n},
+        "eosio"_n,
+        "buyram"_n,
+        std::make_tuple(_self, _self, quantity)}
+        .send();
+
+    action{
+        permission_level{_self, "active"_n},
+        _self,
+        "mint"_n,
+        std::make_tuple(from, bytes)
+    }.send();
+}
+
+void wram::mint(name from, uint64_t prev_bytes) {
+    require_auth(_self);
+
+    rams ramstable("eosio"_n, _self.value);
+    auto itr = ramstable.find(_self.value);
+    auto now_bytes = itr->ram_bytes;
+    auto amount = now_bytes - prev_bytes; //@audit
+    auto quantity = asset(amount, symbol("WRAM", 4));
+
+    action{
+        permission_level{_self, "active"_n},
+        _self,
+        "issue"_n,
+        std::make_tuple(from, quantity, std::string("mint wRAM"))
+    }.send();
+}
+```
+#### Defense Method
+
+The contract itself should maintain a balance sheet to avoid cross-contract table lookups, which can prevent data inconsistency.
+
 
 ## [Reference](#reference)
 
