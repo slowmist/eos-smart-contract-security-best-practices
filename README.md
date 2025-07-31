@@ -33,6 +33,9 @@ English Version: [check here](/README_EN.md)\
       * [漏洞示例](#漏洞示例-5)
       * [防御方法](#防御方法-5)
       * [真实案例](#真实案例-5)
+   * [重入攻击](#重入攻击)
+      * [漏洞示例](#漏洞示例-6)
+      * [防御方法](#防御方法-6)
 * [参考文献](#参考文献)
 * [致谢](#致谢)
 
@@ -309,6 +312,52 @@ EOS链上不能生成真随机数，在设计随机类应用时建议参考官�
 #### 真实案例
 
 - [EOS 回滚攻击手法分析之黑名单篇](https://mp.weixin.qq.com/s/WyZ4j3O68qfN5IOvjx3MOg)
+
+### 重入攻击
+重入是指在一个交易中对同一个函数进行多次的调用。
+在示例漏洞中，如果对`wram::buyram`同时多次调用，由于`action`调用`eosio::buyram`操作是异步的，那么`wram::buyram`取到的`auto bytes = itr->ram_bytes`值是一样的，这会导致第二次调用`mint`时传入的`prev_bytes`没有计入第一次购买的 RAM，导致`auto amount = now_bytes - prev_bytes;`偏大，攻击者获得额外的收益 wRAM。
+
+#### 漏洞示例
+```
+void wram::buyram(name from, name to, asset quantity) {
+    //...snap code...
+    rams ramstable("eosio"_n, _self.value);
+    auto itr = ramstable.find(_self.value);
+    auto bytes = itr->ram_bytes; //@audit
+    action{
+        permission_level{_self, "active"_n},
+        "eosio"_n,
+        "buyram"_n,
+        std::make_tuple(_self, _self, quantity)}
+        .send();
+
+    action{
+        permission_level{_self, "active"_n},
+        _self,
+        "mint"_n,
+        std::make_tuple(from, bytes)
+    }.send();
+}
+
+void wram::mint(name from, uint64_t prev_bytes) {
+    require_auth(_self);
+
+    rams ramstable("eosio"_n, _self.value);
+    auto itr = ramstable.find(_self.value);
+    auto now_bytes = itr->ram_bytes;
+    auto amount = now_bytes - prev_bytes; //@audit
+    auto quantity = asset(amount, symbol("WRAM", 4));
+
+    action{
+        permission_level{_self, "active"_n},
+        _self,
+        "issue"_n,
+        std::make_tuple(from, quantity, std::string("mint wRAM"))
+    }.send();
+}
+```
+#### 防御方法
+合约自身应维护余额表，避免跨合约进行表查询，这样可以防止数据的不一致性。
 
 ## 参考文献
 
